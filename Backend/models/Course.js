@@ -45,6 +45,18 @@ const courseSchema = new mongoose.Schema(
                 required:true,
             }
         ],
+        category: {
+            type: mongoose.Schema.Types.ObjectId,
+            // required: true,
+            ref: "Category",
+        },
+        instructions: {
+            type: [String],
+        },
+        status: {
+            type: String,
+            enum: ["Draft", "Published"],
+        },
     }
 );
 
