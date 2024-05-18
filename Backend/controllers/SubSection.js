@@ -6,7 +6,7 @@ require("dotenv").config();
 exports.createSubSection = async(req,res) => {
     try{
         const {sectionId,title,timeDuration,description} = req.body;
-        const video = req.files.videoFile;
+        const video = req.files.video;
 
         if(!sectionId || !title || !timeDuration || !description || !video){
             return res.status(400).json({
@@ -32,12 +32,12 @@ exports.createSubSection = async(req,res) => {
                 }
             },
             {new:true}
-        );
+        ).populate("subSection")
 
         return res.status(200).json({
             success: true,
             message: "Sub Section created Successfully",
-            updatedSection
+            data: updatedSection
         })
 
     }
@@ -53,23 +53,31 @@ exports.createSubSection = async(req,res) => {
 exports.updateSubSection = async(req,res) => {
     try{
 
-        const {SubSectionId,title,timeDuration,description} = req.body;
-        const video = req.files.videoFile;
-
-        if(!SubSectionId || !title || !timeDuration || !description || !video){
-            return res.status(400).json({
-                success: false,
-                message: "Sub Section fields are missing"
+        const { subSectionId, title, description } = req.body
+        const subSection = await SubSection.findById(subSectionId)
+    
+        if (!subSection) {
+            return res.status(404).json({
+            success: false,
+            message: "SubSection not found",
             })
         }
-
-        const subSection = await SubSection.findByIdAndUpdate(
-            SubSectionId,
-            {
-                title,timeDuration,description,videoUrl
-            },
-            {new:true}
-        );
+    
+        if (title !== undefined) {
+            subSection.title = title
+        }
+    
+        if (description !== undefined) {
+            subSection.description = description
+        }
+        if (req.files && req.files.video !== undefined) {
+            const video = req.files.video
+            const uploadDetails = await uploadImageToCloudinary(video,process.env.FOLDER_NAME)
+            subSection.videoUrl = uploadDetails.secure_url
+            subSection.timeDuration = `${uploadDetails.duration}`
+        }
+    
+        await subSection.save()
 
         return res.status(200).json({
             success: true,
@@ -86,9 +94,23 @@ exports.updateSubSection = async(req,res) => {
 
 exports.deleteSubSection = async(req,res) => {
     try{
-        const {SubSectionId} = req.body;
-
-        await SubSection.findByIdAndDelete(SubSectionId);
+        const { subSectionId, sectionId } = req.body
+        await Section.findByIdAndUpdate(
+            { _id: sectionId },
+            {
+            $pull: {
+                subSection: subSectionId,
+            },
+            }
+        )
+        const subSection = await SubSection.findByIdAndDelete({ _id: subSectionId })
+    
+        if (!subSection) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "SubSection not found" 
+            })
+        }
 
         return res.status(200).json({
             success: true,
