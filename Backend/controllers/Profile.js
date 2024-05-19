@@ -4,35 +4,28 @@ const { uploadImageToCloudinary } = require("../utils/imageUploader");
 
 
 exports.updateProfile = async(req,res) => {
-    try{
-        const {dateOfBirth="", about="", contactNumber, gender} = req.body;
-        const id = req.user.id;
+    try {
+      const { dateOfBirth = "", about = "", contactNumber, gender } = req.body;
+      const id = req.user.id;
 
-        if(!contactNumber || !gender || !id){
-            return res.status(400).json({
-                success: false,
-                message: "Profile Fields not Filled"
-            });
-        }
+      const userDetails = await User.findById(id);
+      const profile = await Profile.findById(userDetails.additionalDetails);
 
-        const userDetails = await User.findById(id);
-        const profileId = userDetails.additionalDetails;
-        const profileDetails = await User.findById(profileId);
+      profile.dateOfBirth = dateOfBirth;
+      profile.about = about;
+      profile.gender = gender;
+      profile.contactNumber = contactNumber;
 
-        profileDetails.dateOfBirth = dateOfBirth;
-        profileDetails.gender = gender;
-        profileDetails.contactNumber = contactNumber;
-        profileDetails.about = about;
-        await profileDetails.save();
+      await profile.save();
 
-        return res.status(200).json({
-            success: true,
-            message: "Profile Fields updated Successfully",
-            profileDetails
-        });
-
+      return res.json({
+        success: true,
+        message: "Profile updated successfully",
+        profile,
+      });
     }
     catch(err){
+      console.log(err);
         return res.status(400).json({
             success: false,
             message: "Profile Fields can't updated due to some errors, please try again"
@@ -77,7 +70,8 @@ exports.getAllUserDetails = async(req,res) => {
  
         return res.status(200).json({
             success: true,
-            message: "User data fetched Successfully"
+            message: "User data fetched Successfully",
+            userDetails
         });
 
     }
@@ -105,12 +99,14 @@ exports.updateDisplayPicture = async (req, res) => {
         { image: image.secure_url },
         { new: true }
       )
-      res.send({
+      res.status.json(200)({
         success: true,
         message: `Image Updated successfully`,
         data: updatedProfile,
       })
-    } catch (error) {
+    } 
+    catch (error) {
+      console.log(error);
       return res.status(500).json({
         success: false,
         message: error.message,
