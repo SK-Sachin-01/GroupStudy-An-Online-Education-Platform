@@ -32,10 +32,12 @@ exports.createSection = async(req,res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Section created Successfully"
+            message: "Section created Successfully",
+            updatedCourse
         })
     }
     catch(err){
+        console.log(err);
         return res.status(500).json({
             success: false,
             message: "Unable to create Section"
