@@ -61,14 +61,6 @@ const userSchema = new mongoose.Schema(
                 ref:"CourseProgress",
             }
         ],
-        confirmPassword:{
-            type: String,
-            required: true,
-        },
-        contactNumber:{
-            type: Number,
-            length:10,
-        },
     },
     { timestamps: true }
 );
