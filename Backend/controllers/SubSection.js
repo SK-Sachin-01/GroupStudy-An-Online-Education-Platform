@@ -42,13 +42,13 @@ exports.createSubSection = async(req,res) => {
 
     }
     catch(err){
+        console.log(err);
         return res.status(500).json({
             success: false,
             message: "Sub Section can't be created due to some error"
         })
     }
 }
-
 
 exports.updateSubSection = async(req,res) => {
     try{
