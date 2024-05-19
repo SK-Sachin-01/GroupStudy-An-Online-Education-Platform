@@ -150,14 +150,14 @@ exports.signup = async(req,res) => {
 
         res.status(200).json({
             success:true,
-            message:"User Registered Successfully"
+            message:"User Registered Successfully",
+            user
         });
     }
 
     catch(error){
-        console.error(error);
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             success:false,
             message:"User can't be registered, please try again later"
         })
