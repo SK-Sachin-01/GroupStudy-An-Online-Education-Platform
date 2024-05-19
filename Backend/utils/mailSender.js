@@ -11,7 +11,7 @@ const mailSender = async(email,title,body) => {
         })
 
         let info = await transporter.sendMail({
-            from: 'StudyNotion',
+            from: 'GroupStudy',
             to: `${email}`,
             subject: `${title}`,
             body: `${body}`,
@@ -23,3 +23,5 @@ const mailSender = async(email,title,body) => {
         console.log(error);
     }
 }
+
+module.exports = mailSender;
