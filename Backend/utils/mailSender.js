@@ -14,7 +14,7 @@ const mailSender = async(email,title,body) => {
             from: 'GroupStudy',
             to: `${email}`,
             subject: `${title}`,
-            body: `${body}`,
+            html: `${body}`,
         })
 
         return info;
